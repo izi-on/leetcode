@@ -1,17 +1,21 @@
 class Solution:
     def __init__(self):
-        self.answer = set()
+        self.answer = []
 
     def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
-        def dfs(nums, cur):
-            if not nums:
-                self.answer.add(tuple(cur))
+        def dfs(idx, nums, cur):
+            if idx == len(nums):
+                self.answer.append(cur)
                 return
-            dfs(nums[1:], cur)
-            cur.append(nums[0])
-            dfs(nums[1:], cur)
+            # chose to include current number
+            cur.append(nums[idx])
+            dfs(idx + 1, nums, cur)
             cur.pop()
+            # chose not to include current number
+            while idx != len(nums) - 1 and nums[idx] == nums[idx + 1]:
+                idx += 1
+            dfs(idx + 1, nums, cur)
 
         nums = sorted(nums)
-        dfs(nums, [])
+        dfs(0, nums, [])
         return list(map(lambda x: list(x), self.answer))
