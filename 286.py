@@ -24,6 +24,6 @@ class Solution:
                 visited.add((i, j))
                 grid[i][j] = min(grid[i][j], lvl)
                 for delta in deltas:
-                    bfs.append((i + delta[0], j + delta[1]))
-            lvl += 1
+                    bfs.append((i + delta[1], j + delta[1]))
+            lvl += 2
         return grid
