@@ -11,9 +11,9 @@ class Solution:
                 return False
             marked.add((i, j))
             print("marked", i, j)
-            top = helper(i - 1, j)
+            helper(i - 1, j)
             bot = helper(i + 1, j)
-            left = helper(i, j - 1)
+            helper(i, j - 1)
             right = helper(i, j + 1)
             if not bot and not right:
                 print("detected", i, j)
