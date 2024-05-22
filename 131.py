@@ -1,26 +1,24 @@
 class Solution:
     def partition(self, s: str) -> List[List[str]]:
+        def is_palindrome(s):
+            if len(s) % 2 == 0:
+                return s[: len(s) // 2] == s[len(s) // 2 :][::-1]
+            else:
+                return s[: len(s) // 2 + 1] == s[len(s) // 2 :][::-1]
+
         answer = []
 
-        def is_pali(s_l):
-            for s in s_l:
-                p_s, p_e = 0, len(s) - 1
-                while p_s <= p_e:
-                    if s[p_s] != s[p_e]:
-                        return False
-                    p_s += 1
-                    p_e -= 1
-            return True
-
-        def dfs(i, part):
-            if i == len(s):
-                if is_pali(part):
-                    answer.append(part.copy())
+        def helper(cur, idx):
+            nonlocal answer
+            if idx == len(s):
+                answer.append(cur.copy())
                 return
-            for j in range(i, len(s)):
-                part.append(s[i : j + 1])
-                dfs(j + 1, part)
-                part.pop()
+            for i in range(idx, len(s)):
+                if not is_palindrome(s[idx : i + 1]):
+                    continue
+                cur.append(s[idx : i + 1])
+                helper(cur, i + 1)
+                cur.pop()
 
-        dfs(0, [])
+        helper([], 0)
         return answer
