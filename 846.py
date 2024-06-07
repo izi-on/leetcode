@@ -1,26 +1,25 @@
-import heapq
-from collections import defaultdict, deque
-from types import TracebackType
+from collections import defaultdict
 
 
 class Solution:
     def isNStraightHand(self, hand: List[int], groupSize: int) -> bool:
         if len(hand) % groupSize != 0:
             return False
-        groupAmt = len(hand) // groupSize
-        track_request = defaultdict(list)
-        count_completed = 0
+        num_of_groups = len(hand) // groupSize
         hand = sorted(hand)
+        groups = defaultdict(list)
+        group_count = 0
         for h in hand:
-            requests = track_request[h]
-            if not requests:
-                track_request[h + 1].append(0)
-                requests = track_request[h + 1]
-            requests[-1] += 1
-            if requests[-1] == groupSize:
-                count_completed += 1
-                requests.pop()
+            # print("at ", h)
+            if len(groups[h - 1]) == 0:
+                # print("making new group")
+                if group_count == num_of_groups:
+                    return False
+                group_count += 1
+                groups[h].append(1)
             else:
-                cur = requests.pop()
-                track_request[h + 1].append(cur)
-        return count_completed == groupAmt
+                # print("adding to group: ", groups[h - 1])
+                num_in_group = groups[h - 1].pop()
+                if num_in_group + 1 != groupSize:
+                    groups[h].append(num_in_group + 1)
+        return True
