@@ -3,8 +3,8 @@ from collections import deque
 
 class Solution:
     def robotWithString(self, s: str) -> str:
-        t = deque()
-        ans = deque()
+        t = []
+        ans = []
         s_idx = 0
 
         def op1():

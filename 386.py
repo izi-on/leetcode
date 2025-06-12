@@ -3,19 +3,20 @@ from collections import deque
 
 class Solution:
     def lexicalOrder(self, n: int) -> List[int]:
-        answer = []
+        ans = deque()
 
-        def helper(cur_num):
-            nonlocal answer
-            if cur_num > n:
+        def helper(cur: int):
+            nonlocal ans
+
+            if cur > n:
                 return
-            answer.append(cur_num)
-            # option 1: extend current number
-            helper(cur_num * 10)
+            ans.append(cur)
 
-            # option 2: increment the current number
-            if cur_num % 10 != 9:
-                helper(cur_num + 1)
+            cur *= 10
+            for c in range(10):
+                cur_c = cur + c
+                helper(cur_c)
 
-        helper(1)
-        return answer
+        for c in range(1, 10):
+            helper(c)
+        return list(ans)
