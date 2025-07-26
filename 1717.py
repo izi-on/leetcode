@@ -1,24 +1,26 @@
-from collections import deque
-
-
 class Solution:
     def maximumGain(self, s: str, x: int, y: int) -> int:
-        new_str = deque()
-        h_p = "ab" if x > y else "ba"
-        for i in range(len(s)):
-            if s[i] == h_p[1] and new_str and new_str[-1] == h_p[0]:
-                new_str.pop()
-            else:
-                new_str.append(s[i])
-        answer = (len(s) - len(new_str)) * max(x, y) // 2
-
-        l_p = "ab" if x <= y else "ba"
-        s = "".join(list(new_str))
-        new_str = deque()
-        for i in range(len(s)):
-            if s[i] == l_p[1] and new_str and new_str[-1] == l_p[0]:
-                new_str.pop()
-            else:
-                new_str.append(s[i])
-        answer += (len(s) - len(new_str)) * min(x, y) // 2
-        return answer
+        q = deque()
+        priority = "ab" if x > y else "ba"
+        priority2 = "ba" if x > y else "ab"
+        p1 = x if x > y else y
+        p2 = y if x > y else x
+        ans = 0
+        for c in s:
+            q.append(c)
+            if len(q) >= 2:
+                comp = q[-1] + q[-2]
+                if comp == priority:
+                    q.pop()
+                    q.pop()
+                    ans += p1
+        q2 = deque()
+        for c in q:
+            q2.append(c)
+            if len(q2) >= 2:
+                comp = q2[-1] + q2[-2]
+                if comp == priority2:
+                    q2.pop()
+                    q2.pop()
+                    ans += p2
+        return ans
