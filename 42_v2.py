@@ -1,23 +1,20 @@
 class Solution:
     def trap(self, height: List[int]) -> int:
-        # get max from the left
-        highest_to_left = [-1] * len(height)
-        track_max = 0
-        for i in range(len(height)):
-            highest_to_left[i] = track_max
-            track_max = max(track_max, height[i])
+        ptr1, ptr2 = 0, len(height) - 1
+        max_left = 0
+        max_right = 0
 
-        # get max from the left
-        highest_to_right = [-1] * len(height)
-        track_max = 0
-        for i in range(len(height) - 1, -1, -1):
-            highest_to_right[i] = track_max
-            track_max = max(track_max, height[i])
+        ans = 0
+        while ptr1 <= ptr2:
+            max_left = max(max_left, height[ptr1])
+            max_right = max(max_right, height[ptr2])
 
-        # calculate water
-        water = 0
-        for i in range(len(height)):
-            smallest_height = min(highest_to_right[i], highest_to_left[i])
-            to_add = max(0, smallest_height - height[i])
-            water += to_add
-        return water
+            if max_left <= max_right:
+                ans += max_left - height[ptr1]
+                ptr1 += 1
+
+            if max_right <= max_left and ptr1 <= ptr2:
+                ans += max_right - height[ptr2]
+                ptr2 -= 1
+
+        return ans
