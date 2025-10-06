@@ -1,46 +1,38 @@
-from collections import deque
-
-
 class Solution:
-    deltas = [[-1, 0], [1, 0], [0, 1], [0, -1]]
-
     def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
-        def get_tiles(prev, cur, visited):
-            i, j = cur
-            if (
-                cur in visited
-                or (not (0 <= i < len(heights) and 0 <= j < len(heights[0])))
-                or prev > heights[i][j]
-            ):
-                return []
-            visited.add(cur)
+        n, m = len(heights), len(heights[0])
+        marked_node_pacific = set()
+        marked_node_atlantic = set()
 
-            tiles = [(i, j)]
-            for delta in Solution.deltas:
-                tiles += get_tiles(heights[i][j], (i + delta[0], j + delta[1]), visited)
-            return tiles
+        deltas = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
-        # do pacific
-        p = []
-        for i in range(1, len(heights)):
-            p.append((i, 0))
-        for i in range(len(heights[0])):
-            p.append((0, i))
-        visited = set()
-        p_tiles = []
-        for tile in p:
-            p_tiles += get_tiles(-1, tile, visited)
+        def in_bounds(cur):
+            return 0 <= cur[0] < n and 0 <= cur[1] < m
 
-        # do altantic
-        a = []
-        for i in range(0, len(heights) - 1):
-            a.append((i, len(heights[0]) - 1))
-        for i in range(len(heights[0])):
-            a.append((len(heights) - 1, i))
-        visited = set()
-        a_tiles = []
-        for tile in a:
-            a_tiles += get_tiles(-1, tile, visited)
+        def get_n(cur):
+            for delta in deltas:
+                cand = (cur[0] + delta[0], cur[1] + delta[1])
+                if in_bounds(cand):
+                    yield cand
 
-        ans = set(a_tiles).intersection(set(p_tiles))
-        return list(map(lambda x: list(x), ans))
+        def explore_mark(start, marked_set):
+            if start in marked_set:
+                return
+            marked_set.add(start)
+            for neighbour in get_n(start):
+                i_s, j_s = start
+                i_n, j_n = neighbour
+                if heights[i_n][j_n] >= heights[i_s][j_s]:
+                    explore_mark(neighbour, marked_set)
+
+        for i in range(n):
+            explore_mark((i, 0), marked_node_pacific)
+        for j in range(m):
+            explore_mark((0, j), marked_node_pacific)
+
+        for i in range(n):
+            explore_mark((i, m - 1), marked_node_atlantic)
+        for j in range(m):
+            explore_mark((n - 1, j), marked_node_atlantic)
+
+        return list(marked_node_pacific.intersection(marked_node_atlantic))

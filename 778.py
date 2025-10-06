@@ -1,32 +1,44 @@
-from collections import deque
-import heapq
-
-
 class Solution:
     def swimInWater(self, grid: List[List[int]]) -> int:
-        start = (0, 0)
-        track_max_along_path = {
-            (i, j): float("infinity")
-            for i in range(len(grid))
-            for j in range(len(grid))
-        }
-        track_max_along_path[(0, 0)] = grid[0][0]
-        bfs = [(grid[0][0], start)]
-        visited = set()
-        deltas = [[-1, 0], [1, 0], [0, -1], [0, 1]]
-        while len(bfs):
-            cur_max, (i, j) = heapq.heappop(bfs)
-            if (i, j) in visited:
-                continue
-            visited.add((i, j))
+        n, m = len(grid), len(grid[0])
+
+        def in_bounds(cur):
+            return 0 <= cur[0] < n and 0 <= cur[1] < m
+
+        deltas = [[-1, 0], [1, 0], [0, 1], [0, -1]]
+
+        def get_n(cur):
             for delta in deltas:
-                i_n = i + delta[0]
-                j_n = j + delta[1]
-                if not (0 <= i_n < len(grid) and 0 <= j_n < len(grid)):
-                    continue
-                candidate_value = max(cur_max, grid[i_n][j_n])
-                if candidate_value >= track_max_along_path[(i_n, j_n)]:
-                    continue
-                track_max_along_path[(i_n, j_n)] = candidate_value
-                heapq.heappush(bfs, (candidate_value, (i_n, j_n)))
-        return track_max_along_path[(len(grid) - 1, len(grid) - 1)]
+                cand = (cur[0] + delta[0], cur[1] + delta[1])
+                if in_bounds(cand):
+                    yield cand
+
+        def is_reachable(cur, height, visited):
+            if cur == (n - 1, m - 1):
+                return True
+
+            if grid[cur[0]][cur[1]] > height:
+                return False
+
+            if cur in visited:
+                return False
+            visited.add(cur)
+
+            possible_neighbours = list(
+                filter(lambda ne: grid[ne[0]][ne[1]] <= height, list(get_n(cur)))
+            )
+
+            return any(
+                [is_reachable(ne, height, visited) for ne in possible_neighbours]
+            )
+
+        l, r = 0, max(max(row) for row in grid)
+        ans = -1
+        while l <= r:
+            mid = (l + r) // 2
+            if is_reachable((0, 0), mid, set()):
+                r = mid - 1
+                ans = mid
+            else:
+                l = mid + 1
+        return ans
